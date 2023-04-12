@@ -8,8 +8,8 @@
 
   <body>
     <div class="container">
-      <ul class="comments">
-        <li id="comment-field" class="comment">
+      <ul class="comments" id="comment-field">
+        <li class="comment">
           <div class="comment-header">
             <div>Глеб Фокин</div>
             <div>12.02.22 12:18</div>
@@ -39,28 +39,27 @@
           <div class="comment-footer">
             <div class="likes">
               <span class="likes-counter">75</span>
-              <button id=".like-button" class="like-button -active-like"></button>
+              <button class="like-button -active-like"></button>
             </div>
           </div>
         </li>
       </ul>
       <div class="add-form">
-        <input id="comment-name"
+        <input 
           type="text"
           class="add-form-name"
-          placeholder="Введите ваше имя"
+          placeholder="Введите ваше имя" id="comment-name"
         />
-        <textarea id="comment-add"
+        <textarea 
           type="textarea"
           class="add-form-text"
-          placeholder="Введите ваш коментарий"
+          placeholder="Введите ваш коментарий" id="comment-input"
           rows="4"
         ></textarea>
       </div>
-        <div id="comment-button" class="add-form-row">
-          <button class="add-form-button">Написать</button>
+        <div class="add-form-row">
+          <button class="add-form-button"  id="comment-button">Написать</button>
         </div>
-      </div>
     </div>
   </body>
 
@@ -73,73 +72,70 @@
   </style>
 
   <script>
+ //создаем переменные 
+ const commentField = document.getElementById('comment-field');
+ const commentName = document.getElementById('comment-name');
+ const commentInput = document.getElementById('comment-input');
+ const commentButton = document.getElementById('comment-button');
 
- let comments = [];
- 
- document.getElementById('comment-button').onclick = function() {
-    let commentName = document.getElementById('comment-name');
-    let commentAdd = document.getElementById('comment-add');
-    let commentLike = document.getElementById('.like-button');
-    let commentButton = document.getElementById('comment-button');
+ // создаем дату и время 
+ const newDate = new Date();
+ const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
+ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    let comment = {
-      name : commentName.value,
-      add : commentAdd.value,
-      time : Math.floor(Date.now()/1000),
-      like : 0,
-    }
+ //создаем данные для HTML разметки //хранение комментов
+  const comments = [
+     {
+         name : 'Глеб Фокин',
+         text : '12.02.22 12:18',
+         date : 'Это будет первый комментарий на этой странице',
+         likes : 3,
+     },
+     {
+         name : 'Варвара Н.',
+         text : '13.02.22 19:22',
+         date : 'Мне нравится как оформлена эта страница! ❤',
+         likes : 75,
+    },
+ ];
 
-  //валидация 
-  commentButton.addEventListener("click", () => {
-    commentName.classList.remove("error");
-    if(commentName.value === "") {
-      commentName.classList.add("error");
-      return;
-    }
-  })
-  commentButton.addEventListener("click", () => {
-    commentAdd.classList.remove("error");
-    if(commentAdd.value === "") {
-      commentAdd.classList.add("error");
-      return;
-    }
-  })  
-
-    //очищаем форму
-    commentName.value = '';
-    commentAdd.value = '';
-    comments.push(comment);
-    saveComments();
-    showComments();
- }
-
- function saveComments() {
-  localStorage.setItem('comments' , JSON.stringify(comments));//сохраняем
- }
-//далле функция выводит на экран
- function showComments() {
-  let commentField = document.getElementById('comment-field');
-  let out = '';
-  comments.forEach(function(item) {
-    out += `<p class="text-right small">${timeConverter(item.time)}</p>`;
-    out += `<p class="primary">${item.name}</p>`;
-    out += `<p class="comm">${item.add}</p>`;
-    out += `<p class="like">${item.like}</p>`;
-  })
-  commentField.innerHTML = out;
- } 
-
- function timeConverter(date_time) {
-  let all = new Date(date_time * 1000);
-  let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  let year = all.getFullYear();
-  let month = months[all.getMonth()];
-  let date = all.getDate();
-  let hour = all.getHours();
-  let min = all.getMinutes();
-  let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min ;
-  return time;
- }
-
+     commentButton.addEventListener('click', () => {
+         const userDate = newDate.getDate() + " " + months[newDate.getMonth()] + " " + newDate.getFullYear();
+         const userTime = newDate.getHours() + ":" + newDate.getMinutes() + ":" + newDate.getSeconds();
+    
+         commentName.classList.remove('error') //валидация
+         if(commentName.value === "") {
+             commentName.classList.add('error')
+             return;
+         }
+         commentInput.classList.remove('error')
+         if(commentInput.value === "") {
+             commentInput.classList.add('error')
+             return;
+         }
+        
+         const oldField = commentField.innerHTML;
+         commentField.innerHTML = oldField + 
+         `<li class="comment">
+         <div class="comment-header">
+           <div>${commentName.value}</div>
+           <div>${userDate} ${userTime}</div>
+         </div>
+         <div class="comment-body">
+           <div class="comment-text">
+             ${commentInput.value}
+           </div>
+         </div>
+         <div class="comment-footer">
+           <div class="likes">
+             <span class="likes-counter"></span>
+             <button class="like-button -active-like"></button>
+           </div>
+         </div>
+      </li>`
+       commentName.value = "";
+       commentInput.value = "";
+    
+     })
   </script>
 </html>
