@@ -56,7 +56,6 @@
           placeholder="Введите ваш коментарий" id="comment-input"
           rows="4"
         ></textarea>
-      </div>
         <div class="add-form-row">
           <button class="add-form-button"  id="comment-button">Написать</button>
         </div>
@@ -77,6 +76,7 @@
  const commentName = document.getElementById('comment-name');
  const commentInput = document.getElementById('comment-input');
  const commentButton = document.getElementById('comment-button');
+ //const commentLike = document.getElementById('.like-button');
 
  // создаем дату и время 
  const newDate = new Date();
@@ -89,15 +89,63 @@
          name : 'Глеб Фокин',
          text : '12.02.22 12:18',
          date : 'Это будет первый комментарий на этой странице',
-         likes : 3,
+         likesCounter : 3,//счетчик лайков
+         isLike : false,
+         isEdit : false,
      },
      {
          name : 'Варвара Н.',
          text : '13.02.22 19:22',
          date : 'Мне нравится как оформлена эта страница! ❤',
-         likes : 75,
+         likesCounter : 75,
+         isLike : false,
+         isEdit : false,
     },
  ];
+    //like
+   const eventLikeButton = () => {
+    document.querySelectorAll('.like-button').forEach((button => {
+        button.addEventListener('click', () => {
+            objComment = comments[button.dataset.index];
+            if (objComment.isLike){
+                objComment.likeCounter -= 1; 
+                objComment.isLike = false;
+
+            } else {
+                objComment.likeCounter += 1; 
+                objComment.isLike = true;
+            }
+            renderAllComments();
+        })
+    }));
+   }   
+   //рендер функция
+   const renderComment = (name, text, date, isLike, likeCounter, isEdit, index) => {
+    commentField.innerHTML += ` 
+        <li class="comment">
+            <div class="comment-header">
+            <div>${name}</div>
+            <div>${date}</div>
+            </div>
+            <div class="comment-body">
+                ${isEdit ? `<textArea data-index="${index}" class="input-text">${text}</textArea>` : `<div class="comment-text">${text}</div>`}
+            </div>
+            <div class="comment-footer">
+            <div class="likes">
+                <span class="likes-counter">${likeCounter}</span>
+                <button data-index="${index}" class="like-button ${isLike ? '-active-like': ''}"></button>
+            </div>
+            </div>
+        </li>
+    `;}
+
+      const renderAllComments = () => {
+      commentField.innerHTML = '';
+      comments.forEach((comment, index) => renderComment(comment.name, comment.text, comment.date, comment.isLike, comment.likeCounter, comment.isEdit, index));
+      eventLikeButton();
+
+     }
+      renderAllComments();
 
      commentButton.addEventListener('click', () => {
          const userDate = newDate.getDate() + " " + months[newDate.getMonth()] + " " + newDate.getFullYear();
@@ -128,14 +176,13 @@
          </div>
          <div class="comment-footer">
            <div class="likes">
-             <span class="likes-counter"></span>
-             <button class="like-button -active-like"></button>
+            <span class="likes-counter"></span>
+            <button class="like-button"></button>
            </div>
          </div>
       </li>`
        commentName.value = "";
        commentInput.value = "";
-    
      })
   </script>
 </html>
