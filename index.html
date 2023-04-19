@@ -76,113 +76,117 @@
  const commentName = document.getElementById('comment-name');
  const commentInput = document.getElementById('comment-input');
  const commentButton = document.getElementById('comment-button');
- //const commentLike = document.getElementById('.like-button');
+ const date = new Date();
 
- // создаем дату и время 
- const newDate = new Date();
- const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
- const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+//  const newDate = new Date();
+//  const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
+//  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
  //создаем данные для HTML разметки //хранение комментов
   const comments = [
      {
          name : 'Глеб Фокин',
-         text : '12.02.22 12:18',
-         date : 'Это будет первый комментарий на этой странице',
+         text : 'Это будет первый комментарий на этой странице',
+         date : '12.02.22 12:18',
          likesCounter : 3,//счетчик лайков
          isLike : false,
          isEdit : false,
      },
      {
          name : 'Варвара Н.',
-         text : '13.02.22 19:22',
-         date : 'Мне нравится как оформлена эта страница! ❤',
+         text : 'Мне нравится как оформлена эта страница! ❤',
+         date : '13.02.22 19:22',
          likesCounter : 75,
-         isLike : false,
+         isLike : true,
          isEdit : false,
     },
  ];
-    //like
-   const eventLikeButton = () => {
-    document.querySelectorAll('.like-button').forEach((button => {
-        button.addEventListener('click', () => {
-            objComment = comments[button.dataset.index];
-            if (objComment.isLike){
-                objComment.likeCounter -= 1; 
-                objComment.isLike = false;
-
-            } else {
-                objComment.likeCounter += 1; 
-                objComment.isLike = true;
-            }
-            renderAllComments();
-        })
-    }));
-   }   
-   //рендер функция
-   const renderComment = (name, text, date, isLike, likeCounter, isEdit, index) => {
-    commentField.innerHTML += ` 
-        <li class="comment">
-            <div class="comment-header">
-            <div>${name}</div>
-            <div>${date}</div>
-            </div>
-            <div class="comment-body">
-                ${isEdit ? `<textArea data-index="${index}" class="input-text">${text}</textArea>` : `<div class="comment-text">${text}</div>`}
-            </div>
-            <div class="comment-footer">
-            <div class="likes">
-                <span class="likes-counter">${likeCounter}</span>
-                <button data-index="${index}" class="like-button ${isLike ? '-active-like': ''}"></button>
-            </div>
-            </div>
-        </li>
-    `;}
-
-      const renderAllComments = () => {
-      commentField.innerHTML = '';
-      comments.forEach((comment, index) => renderComment(comment.name, comment.text, comment.date, comment.isLike, comment.likeCounter, comment.isEdit, index));
-      eventLikeButton();
-
-     }
-      renderAllComments();
-
-     commentButton.addEventListener('click', () => {
-         const userDate = newDate.getDate() + " " + months[newDate.getMonth()] + " " + newDate.getFullYear();
-         const userTime = newDate.getHours() + ":" + newDate.getMinutes() + ":" + newDate.getSeconds();
-    
-         commentName.classList.remove('error') //валидация
-         if(commentName.value === "") {
-             commentName.classList.add('error')
-             return;
-         }
-         commentInput.classList.remove('error')
-         if(commentInput.value === "") {
-             commentInput.classList.add('error')
-             return;
-         }
-        
-         const oldField = commentField.innerHTML;
-         commentField.innerHTML = oldField + 
-         `<li class="comment">
-         <div class="comment-header">
-           <div>${commentName.value}</div>
-           <div>${userDate} ${userTime}</div>
-         </div>
-         <div class="comment-body">
-           <div class="comment-text">
-             ${commentInput.value}
-           </div>
-         </div>
-         <div class="comment-footer">
-           <div class="likes">
-            <span class="likes-counter"></span>
-            <button class="like-button"></button>
-           </div>
-         </div>
+ // Создаем рендер-функцию (преобразование данных в коде в отображение, которое видит пользователь.)
+ const commentRender = () => {
+  const commentHtml = comments.map((comments, index) => {
+      return `<li class="comment" data-index="${index}">
+      <div class="comment-header">
+        <div>${comments.name}</div>
+        <div>${comments.date}</div>
+      </div>
+      <div class="comment-body">
+        ${comments.isEdit ? `<textarea id="input" class="comment-text textarea" type="texrarea">${comments.text}</textarea>` : `<div class="comment-text">${comments.text.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}</div>`}
+      </div>
+      <div class="comment-footer">
+        <div class="likes">
+          <span class="likes-counter">${comments.likesCounter}</span>
+          <button class="like-button ${comments.isLike ? '-active-like' : ''}" data-index="${index}"></button>
+        </div>
+      </div>
       </li>`
-       commentName.value = "";
-       commentInput.value = "";
-     })
+  })
+  .join('');
+  commentField.innerHTML = commentHtml;
+  initLikesButton();
+  commentReply();
+  
+ }
+ commentRender();
+
+ // ивент на кнопки лайка
+ function initLikesButton() {
+  const commentLikes = document.querySelectorAll(".like-button");
+  for (const buttonLike of commentLikes) {
+    const index = buttonLike.dataset.index;
+    buttonLike.addEventListener("click", (eventLike) => {
+      eventLike.stopPropagation();// кликаем на кнопку лайка и эта функция прерывает дальнейшие всплытия событий 
+      if (comments[index].isLike) {
+        comments[index].isLike = false;
+        comments[index].likesCounter -= 1;
+      } else {
+        comments[index].isLike = true;
+        comments[index].likesCounter += 1;
+      }
+    commentRender();
+    })
+  }
+ }
+ // событие на ответ на коммент пользователя 
+ function commentReply () {
+  const replayEl = document.querySelectorAll(".comment");
+  for (const el of replayEl) {
+    const index = el.dataset.index;
+    el.addEventListener('click', () => {
+      commentInput.value =`QUOTE_BEGIN « ${comments[index].text} » (${comments[index].name}) QUOTE_END \n` ;
+      commentRender();
+    })
+  }
+ }
+ //добавление обработчиков клика на динамически созданные элементы
+ commentButton.addEventListener("click", () => {
+    commentName.classList.remove("error"); // добавляем валидацию если пользователь не ввел имя/коммент 
+    if (commentName.value === "") { // 
+      commentName.classList.add("error"); // 
+      return;
+    }
+    commentInput.classList.remove("error");
+    if (commentInput.value === "") {
+      commentInput.classList.add("error");
+      return;
+    }
+     commentFuncButton();
+   });
+   // для добавления нового коммента 
+   function commentFuncButton()  {
+   comments.push({
+    name: commentName.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'), 
+    // Делаем HTML-строку безопасной для рендера, заменяя управляющие символы HTML на спец. символы
+    //После добавления комментария введенные теги не должны срабатывать, то есть имя и текст должны отображаться так, как их ввел пользователь
+    date: `${date.getDate() < 10 ? "0" : ""}${date.getDate()}.${date.getMonth() < 10 ? "0" : ""}${date.getMonth() + 1}.${date.getFullYear() - 2000} ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`,
+    text: commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
+    likesCounter: 0,
+    isLike: false,
+    isEdit: false,
+   })
+   commentRender();
+   commentName.value = ""; // очищаем поле формы после ввода
+   commentInput.value = "";
+  }
+// дописать нориально кнопку редактирования,удаления
   </script>
 </html>
