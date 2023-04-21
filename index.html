@@ -101,6 +101,16 @@
          isEdit : false,
     },
  ];
+ const getComment = () => {
+    fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
+      method:"GET"
+    }).then((response) => {
+      response.json().then((Data) => {
+        comments = Data.comments;
+        commentRender();
+      });
+    });
+  };
  // Создаем рендер-функцию (преобразование данных в коде в отображение, которое видит пользователь.)
  const commentRender = () => {
   const commentHtml = comments.map((comments, index) => {
@@ -173,7 +183,7 @@
    });
    // для добавления нового коммента 
    function commentFuncButton()  {
-   comments.push({
+    comments.push({
     name: commentName.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'), 
     // Делаем HTML-строку безопасной для рендера, заменяя управляющие символы HTML на спец. символы
     //После добавления комментария введенные теги не должны срабатывать, то есть имя и текст должны отображаться так, как их ввел пользователь
@@ -182,11 +192,26 @@
     likesCounter: 0,
     isLike: false,
     isEdit: false,
-   })
+    });
+ commentRender();
    commentRender();
    commentName.value = ""; // очищаем поле формы после ввода
    commentInput.value = "";
   }
-// дописать нориально кнопку редактирования,удаления
+  fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
+      method:"POST",
+      body : JSON.stringify({
+        text : commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
+      name: commentName.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    })
+  }).then((response) =>
+  response.json().then((data) => {
+   commentRender();
+  })
+ );
+ commentRender();
+
+
+// 
   </script>
 </html>
