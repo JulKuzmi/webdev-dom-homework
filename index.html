@@ -83,24 +83,7 @@
 //  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
  //создаем данные для HTML разметки //хранение комментов
-  const comments = [
-     {
-         name : 'Глеб Фокин',
-         text : 'Это будет первый комментарий на этой странице',
-         date : '12.02.22 12:18',
-         likesCounter : 3,//счетчик лайков
-         isLike : false,
-         isEdit : false,
-     },
-     {
-         name : 'Варвара Н.',
-         text : 'Мне нравится как оформлена эта страница! ❤',
-         date : '13.02.22 19:22',
-         likesCounter : 75,
-         isLike : true,
-         isEdit : false,
-    },
- ];
+  const comments = [];
  const getComment = () => {
     fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
       method:"GET"
@@ -168,7 +151,42 @@
   }
  }
  //добавление обработчиков клика на динамически созданные элементы
- commentButton.addEventListener("click", () => {
+//  commentButton.addEventListener("click", () => {
+//     commentName.classList.remove("error"); // добавляем валидацию если пользователь не ввел имя/коммент 
+//     if (commentName.value === "") { // 
+//       commentName.classList.add("error"); // 
+//       return;
+//     }
+//     commentInput.classList.remove("error");
+//     if (commentInput.value === "") {
+//       commentInput.classList.add("error");
+//       return;
+//     }
+//      commentFuncButton();
+//    });
+   // для добавления нового коммента 
+   function commentFuncButton()  {
+    fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
+      method:"POST",
+      body : JSON.stringify({
+    name: commentName.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'), 
+    // Делаем HTML-строку безопасной для рендера, заменяя управляющие символы HTML на спец. символы
+    //После добавления комментария введенные теги не должны срабатывать, то есть имя и текст должны отображаться так, как их ввел пользователь
+    date: `${date.getDate() < 10 ? "0" : ""}${date.getDate()}.${date.getMonth() < 10 ? "0" : ""}${date.getMonth() + 1}.${date.getFullYear() - 2000} ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`,
+    text: commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
+    likesCounter: 0,
+    isLike: false,
+    isEdit: false,
+    })
+  }).then((response) => {
+   response.json().then((data) => {
+    getComment();
+  });
+})
+      commentName.value = ""; // очищаем поле формы после ввода
+      commentInput.value = "";
+}
+commentButton.addEventListener("click", () => {
     commentName.classList.remove("error"); // добавляем валидацию если пользователь не ввел имя/коммент 
     if (commentName.value === "") { // 
       commentName.classList.add("error"); // 
@@ -179,39 +197,16 @@
       commentInput.classList.add("error");
       return;
     }
-     commentFuncButton();
+    commentFuncButton();
+    //  getComment();
    });
-   // для добавления нового коммента 
-   function commentFuncButton()  {
-    comments.push({
-    name: commentName.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'), 
-    // Делаем HTML-строку безопасной для рендера, заменяя управляющие символы HTML на спец. символы
-    //После добавления комментария введенные теги не должны срабатывать, то есть имя и текст должны отображаться так, как их ввел пользователь
-    date: `${date.getDate() < 10 ? "0" : ""}${date.getDate()}.${date.getMonth() < 10 ? "0" : ""}${date.getMonth() + 1}.${date.getFullYear() - 2000} ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`,
-    text: commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
-    likesCounter: 0,
-    isLike: false,
-    isEdit: false,
-    });
- commentRender();
-   commentRender();
-   commentName.value = ""; // очищаем поле формы после ввода
-   commentInput.value = "";
-  }
-  fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
-      method:"POST",
-      body : JSON.stringify({
-        text : commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
-      name: commentName.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
-    })
-  }).then((response) =>
-  response.json().then((data) => {
-   commentRender();
-  })
- );
- commentRender();
+ 
 
 
+//  commentRender();
+//    commentRender();
+//    commentName.value = ""; // очищаем поле формы после ввода
+//    commentInput.value = "";
 // 
   </script>
 </html>
