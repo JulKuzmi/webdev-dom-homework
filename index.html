@@ -11,6 +11,7 @@
       <ul class="comments" id="comment-field">
          <!--список рендерится из js -->
       </ul>
+      <div class="loading"></div>
       <div class="add-form">
         <input 
           type="text"
@@ -43,6 +44,7 @@
  const commentName = document.getElementById('comment-name');
  const commentInput = document.getElementById('comment-input');
  const commentButton = document.getElementById('comment-button');
+ const commentLoading = document.querySelector('.loading');
  const date = new Date();
 
  //создаем данные для HTML разметки //хранение комментов
@@ -52,12 +54,15 @@
  function getComment() {
     fetch("https://webdev-hw-api.vercel.app/api/v1/julia/comments",{
       method:"GET"
-    }).then((response) => {
-      response.json().then((Data) => {
-        comments = Data.comments;
-        commentRender();
-      });
-    });
+    })
+    .then((response) => {
+      return response.json();
+      })
+    .then((Data) => {
+      comments = Data.comments;
+      commentLoading.classList.add("display-none");
+      commentRender();
+    })  
   };
   getComment();
  // Создаем рендер-функцию (преобразование данных в коде в отображение, которое видит пользователь.)
@@ -120,6 +125,7 @@
  }
    // для добавления нового коммента 
    function commentFuncButton()  {
+    commentLoading.classList.remove("display-none")
     fetch('https://webdev-hw-api.vercel.app/api/v1/julia/comments', {
     method: "POST",
     body: JSON.stringify({
@@ -132,13 +138,9 @@
       isLiked: false,
       isEdit: false,
     })
-  }).then((response) => {
-    response.json().then((Data) => {
+  }).then(() => {
       getComment();
-      commentRender();
-    });
-  });
-  commentRender();
+  });// убираем вложенность
   commentName.value = ""; // очищаем поле формы после ввода
   commentInput.value = "";
 }
