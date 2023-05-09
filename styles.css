@@ -131,6 +131,12 @@ body {
     border-radius: 18px;
     cursor: pointer;
   }
+  
+  .error{
+    border: 2px dashed red;
+    box-shadow: 0 0 5px 1px red;
+  }
+
 
   .add-form-button:hover {
     opacity: 0.9;
