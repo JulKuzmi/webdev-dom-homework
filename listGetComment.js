@@ -1,4 +1,4 @@
-export const listGet = (comments, index) => {
+export const listGetComments = (comments, index) => {
     return `<li class="comment" data-index="${index}">
       <div class="comment-header">
         <div>${comments.author.name}</div>

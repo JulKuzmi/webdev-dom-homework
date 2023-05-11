@@ -1,7 +1,7 @@
 
  import { commentRender } from "./commentRender.js";
- import { listGet } from "./listGetComment.js";
- import { apiGetComment, ap, apiPost } from "./api.js";
+ import {  apiGetFetch, apiPostFetch } from "./api.js";
+ import { listGetComments } from "./listGetComment.js";
  const commentField = document.getElementById('comment-field');
  const commentName = document.getElementById('comment-name');
  const commentInput = document.getElementById('comment-input');
@@ -10,47 +10,23 @@
  const date = new Date();
 
  //создаем данные для HTML разметки //хранение комментов
+ let comments = [];
 
- let comments = []; //перерасперделяем на let
-function getComment(){
- apiGetComment()
+ function getComment(){
+ apiGetFetch()
     .then((Data) => {
       comments = Data.comments;
       commentLoading.classList.add("display-none");
-      commentRender(comments, commentField, getFieldCommen);
+      commentRender(comments, commentField, listGetComments);
       initLikesButton();
       commentReply();
     })  
   }
   getComment();
- // Создаем рендер-функцию (преобразование данных в коде в отображение, которое видит пользователь.)
-//  const commentRender = () => {
-//   const commentHtml = comments.map((comments, index) => {
-//       return `<li class="comment" data-index="${index}">
-//       <div class="comment-header">
-//         <div>${comments.author.name}</div>
-//         <div>${comments.date}</div>
-//       </div>
-//       <div class="comment-body">
-//         ${comments.isEdit ? `<textarea id="input" class="comment-text textarea" type="texrarea">${comments.text}</textarea>` : `<div class="comment-text">${comments.text.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}</div>`}
-//       </div>
-//       <div class="comment-footer">
-//         <div class="likes">
-//           <span class="likes-counter">${comments.likes}</span>
-//           <button class="like-button ${comments.isLike ? '-active-like' : ''}" data-index="${index}"></button>
-//         </div>
-//       </div>
-//       </li>`
-//   })
 
-//   .join('');
-//   commentField.innerHTML = commentHtml;
-//   initLikesButton();
-//   commentReply();
-  
-//  }
-//  commentRender();
- commentRender(comments, commentField, getFieldCommen);
+
+  commentRender(comments, commentField, listGetComments);
+
  // ивент на кнопки лайка
  function initLikesButton() {
   const commentLikes = document.querySelectorAll(".like-button");
@@ -65,7 +41,7 @@ function getComment(){
         comments[index].isLike = true;
         comments[index].likes += 1;
       }
-      commentRender(comments, commentField, getFieldCommen);
+      commentRender(comments, commentField, listGetComments);
       initLikesButton();
     })
   }
@@ -78,7 +54,7 @@ function getComment(){
     const index = el.dataset.index;
     el.addEventListener('click', () => {
       commentInput.value = `» ${comments[index].text} (${comments[index].author.name}) © \n `;
-      commentRender(comments, commentField, getFieldCommen);
+      commentRender(comments, commentField, listGetComments);
     })
   }
  }
@@ -98,30 +74,34 @@ function getComment(){
     commentAnimation();
    });
 
-   comments.push({
-    name: commentName.value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;'), 
-    date: `${date.getDate() < 10 ? "0" : ""}${date.getDate()}.
-    ${date.getMonth() < 10 ? "0" : ""}${date.getMonth() + 1}.
-    ${date.getFullYear() - 2000} 
-    ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:
-    ${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`,
-    text: commentInput.value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;'),
-    likes: 0,
-    isLiked: false,
-    isEdit: false,
-    forceError: true, 
-   })
+    // для добавления нового коммента 
+    function commentAnimation() {
+      commentLoading.classList.remove("display-none")
 
+      comments.push({
+        name: commentName.value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;'), 
+        date: `${date.getDate() < 10 ? "0" : ""}${date.getDate()}.
+        ${date.getMonth() < 10 ? "0" : ""}${date.getMonth() + 1}.
+        ${date.getFullYear() - 2000} 
+        ${date.getHours() < 10 ? "0" : ""}${date.getHours()}:
+        ${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`,
+        text: commentInput.value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;'),
+        likes: 0,
+        isLiked: false,
+        isEdit: false,
+        forceError: true, 
+       })
+    
    function funcPost() {
-    apiPost(commentName.value, commentInput.value)
+    apiPostFetch(commentName.value, commentInput.value)
       .then((response) => {
               if(response.status === 201){
                 commentName.value = ""; // очищаем поле формы после ввода
@@ -147,27 +127,9 @@ function getComment(){
   } 
  funcPost();
 
-
-
-   // для добавления нового коммента 
-   function commentAnimation() {
-      commentLoading.classList.remove("display-none")
     
       function commentFuncButton()  {
-    //     fetch('https://webdev-hw-api.vercel.app/api/v1/julia/comments', {
-    //     method: "POST",
-    //     body: JSON.stringify({
-    //          name: commentName.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'), 
-    //          date: `${date.getDate() < 10 ? "0" : " "}${date.getDate()}.${date.getMonth() < 10 ? "0" : " "}${date.getMonth() + 1}.${date.getFullYear() - 2000} 
-    //          ${date.getHours() < 10 ? "0" : " "}${date.getHours()}:${date.getMinutes() < 10 ? "0" : " "}${date.getMinutes()}`,
-    //          text: commentInput.value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'),
-    //          likes: 0,
-    //          isLiked: false,
-    //          isEdit: false,
-    //          forceError: true,//POST-запрос будет в половине случаев отвечать 500-й ошибкой, если в теле запроса передать параметр
-    //     })
-    //   })
-    apiPost(commentName.value, commentInput.value)
+    apiPostFetch(commentName.value, commentInput.value)
       .then((response) => {
               if(response.status === 201){
                 commentName.value = ""; // очищаем поле формы после ввода
