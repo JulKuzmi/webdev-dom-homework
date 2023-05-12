@@ -126,32 +126,4 @@
      })
   } 
  funcPost();
-
-    
-      function commentFuncButton()  {
-    apiPostFetch(commentName.value, commentInput.value)
-      .then((response) => {
-              if(response.status === 201){
-                commentName.value = ""; // очищаем поле формы после ввода
-                commentInput.value = "";
-              }
-              else if (response.status === 400){
-               alert("Содержание комментария и имя пользователя должно состоять не менее чем из трех символов, введите пожалуйста заново");
-              } else {
-                       throw new Error("Упал сервер");
-              }
-       })
-      .then(() => {
-      return getComment();
-     })
-     .catch((error) => {
-         if(error.message === "Упал сервер"){
-                commentFuncButton();
-         } else {
-                alert("Упс, кажется у вас упал интернет, попробуйте позже!");
-                commentLoading.classList.remove("display-none");
-         }
-     })
-  } 
- commentFuncButton();
 }
