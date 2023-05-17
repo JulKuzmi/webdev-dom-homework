@@ -2,13 +2,13 @@
  import { commentRender } from "./commentRender.js";
  import {  apiGetFetch, apiPostFetch } from "./api.js";
  import { listGetComments } from "./listGetComment.js";
- import { format } from "./node_modules/date-fns";
  const commentField = document.getElementById('comment-field');
  const commentName = document.getElementById('comment-name');
  const commentInput = document.getElementById('comment-input');
  const commentButton = document.getElementById('comment-button');
  const commentLoading = document.querySelector('.loading');
  const date = new Date();
+ import { format } from "./node_modules/date-fns";
 
  //создаем данные для HTML разметки //хранение комментов
  let comments = [];
