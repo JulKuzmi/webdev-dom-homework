@@ -1,6 +1,6 @@
 export const listGetComments = (comments, index) => {
-  // const now = new Date();
-  // const createDate = format(now, "MM-dd-yyyy hh:mm"); // 03-26-2023 10:33
+   //const now = new Date();
+   //const createDate = format(now, "MM-dd-yyyy hh:mm"); // 03-26-2023 10:33
     return `<li class="comment" data-index="${index}">
       <div class="comment-header">
         <div>${comments.author.name}</div>
