@@ -1,26 +1,6 @@
-// модуль api js с запросоми апи, функция фич вызыввается в этом модуде
-//  export function apiGetFetch() {
-//     return fetch(token = null;,{
-//       method:"GET"
-//     })
-//     .then((response) => {
-//       return response.json();
-//       })
-//  }
+ let host = "https://webdev-hw-api.vercel.app/api/v2/julia/comments"
 
-//  export function apiPostFetch(commentName, commentInput) {
-//     return fetch('https://webdev-hw-api.vercel.app/api/v2/julia/comments', {
-//         method: "POST",
-//         body: JSON.stringify({
-//             name: commentName,
-//             text: commentInput,
-//         })
-//     })
-//  }
-
-let host = "https://webdev-hw-api.vercel.app/api/v2/julia/comments"
-
-export function fetchComments({ token }){
+ export function fetchComments({ token }){
   return fetch(host, {
    method: "GET",
    headers: {
