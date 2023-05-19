@@ -2,7 +2,7 @@
   "name": "webdev-dom-homework",
   "version": "1.0.0",
   "description": "https://glebkaf.github.io/webdev-dom-homework/",
-  "main": "api.js",
+  "main": "script.js",
   "scripts": {
     "dev": "webpack --mode development --watch"
   },
